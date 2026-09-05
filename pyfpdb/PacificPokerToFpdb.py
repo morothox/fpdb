@@ -92,7 +92,7 @@ class PacificPoker(HandHistoryConverter):
     # Static regexes
     re_GameInfo     = re.compile(u"""
           (\#Game\sNo\s:\s[0-9]+\\n)?
-          \*\*\*\*\*\sCassava\sHand\sHistory\sfor\sGame\s(?P<HID>[0-9]+)\s\*\*\*\*\*\\n
+          \*\*\*\*\*\s(Cassava|888poker|Pacific\sPoker)\sHand\sHistory\sfor\sGame\s(?P<HID>[0-9]+)\s\*\*\*\*\*\\n
           (?P<CURRENCY1>%(LS)s)?(?P<SB>[%(NUM)s]+)\s?(?P<CURRENCY2>%(LS)s)?/(%(LS)s)?(?P<BB>[%(NUM)s]+)\s?(%(LS)s)?\sBlinds\s
           (?P<LIMIT>No\sLimit|Fix\sLimit|Pot\sLimit)\s
           (?P<GAME>Holdem|Omaha|OmahaHL|Hold\'em|Omaha\sHi/Lo|OmahaHL|Razz|RAZZ|7\sCard\sStud|7\sCard\sStud\sHi/Lo|Badugi|Triple\sDraw\s2\-7\sLowball|Single\sDraw\s2\-7\sLowball|5\sCard\sDraw)
@@ -505,10 +505,14 @@ class PacificPoker(HandHistoryConverter):
     def getTableTitleRe(type, table_name=None, tournament = None, table_number=None):
         # Tournament tables look like:
         # Tour NLH 50+5 Brouhaha ID #28353026 Table #7 Blinds: 200/400
+        # or 888poker macOS window titles like "Table Name - $0.01/$0.02 No Limit Hold'em"
         log.info("Pacific.getTableTitleRe: table_name='%s' tournament='%s' table_number='%s'" % (table_name, tournament, table_number))
-        regex = "%s" % (table_name)
         if tournament:
-            regex = "%s Table #%s" % (tournament, table_number)
+            regex = r"(%s.*Table\s*#?\s*%s|Table\s*#?\s*%s.*%s)" % (re.escape(str(tournament)), re.escape(str(table_number)), re.escape(str(table_number)), re.escape(str(tournament)))
+        elif table_name:
+            regex = r"%s" % re.escape(str(table_name))
+        else:
+            regex = r".*"
 
         log.info("Pacific.getTableTitleRe: returns: '%s'" % (regex))
         return regex

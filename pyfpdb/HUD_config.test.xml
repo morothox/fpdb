@@ -652,7 +652,7 @@ Left-Drag to Move"
             </layout>
         </site>
 
-        <site HH_path="C:/Program Files/PacificPoker/HandHistory/Hero/" converter="PacificPokerToFpdb" decoder="everleaf_decode_table" enabled="True" screen_name="Hero" site_name="PacificPoker" site_path="C:/Program Files/PacificPoker/" supported_games="holdem" table_finder="PacificPoker.exe">
+        <site HH_path="~/Documents/888poker/HandHistory/Hero/" converter="PacificPokerToFpdb" decoder="everleaf_decode_table" enabled="True" screen_name="Hero" site_name="PacificPoker" site_path="~/Documents/888poker/" supported_games="holdem" table_finder="PacificPoker">
             <layout fav_seat="0" height="547" max="8" width="794">
                 <location seat="1" x="640" y="64">  </location>
                 <location seat="2" x="650" y="230"> </location>
