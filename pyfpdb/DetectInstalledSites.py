@@ -71,21 +71,10 @@ class DetectInstalledSites():
         self.supportedSites = [ "Full Tilt Poker",
                                 "PartyPoker",
                                 "Merge",
-                                "PokerStars"]#,
-                                #"Everleaf",
-                                #"Win2day",
-                                #"OnGame",
-                                #"UltimateBet",
-                                #"Betfair",
-                                #"Absolute",
-                                #"PacificPoker",
-                                #"Partouche",
-                                #"PKR",
-                                #"iPoker",
-                                #"Winamax",
-                                #"Everest" ]
+                                "PokerStars",
+                                "PacificPoker"]
 
-        self.supportedPlatforms = ["Linux", "XP", "Win7"]
+        self.supportedPlatforms = ["Linux", "XP", "Win7", "Mac"]
 
         if sitename == "All":
             for siteiter in self.supportedSites:
@@ -111,6 +100,8 @@ class DetectInstalledSites():
             self.detectPokerStars()
         elif siteToDetect == "Merge":
             self.detectMergeNetwork()
+        elif siteToDetect in ("PacificPoker", "888poker", "888"):
+            self.detectPacificPoker()
 
         if (self.pathfound and self.herofound):
             self.pathfound = unicode(self.pathfound)
@@ -141,6 +132,40 @@ class DetectInstalledSites():
         except:
             pass
 
+        return
+
+    def detectPacificPoker(self):
+        possible_paths = []
+
+        if self.Config.os_family == "Mac":
+            possible_paths = [
+                os.path.expanduser("~/Documents/888poker/HandHistory/"),
+                os.path.expanduser("~/Documents/PacificPoker/HandHistory/"),
+                os.path.expanduser("~/Library/Application Support/888poker/HandHistory/"),
+                os.path.expanduser("~/.888poker/HandHistory/"),
+            ]
+        elif self.Config.os_family == "Linux":
+            possible_paths = [
+                os.path.expanduser("~/.wine/drive_c/Program Files/PacificPoker/HandHistory/"),
+                os.path.expanduser("~/.wine/drive_c/Program Files/888poker/HandHistory/"),
+            ]
+        elif self.Config.os_family in ("XP", "Win7"):
+            possible_paths = [
+                os.path.expanduser(PROGRAM_FILES + "\\PacificPoker\\HandHistory\\"),
+                os.path.expanduser(PROGRAM_FILES + "\\888poker\\HandHistory\\"),
+            ]
+
+        for hhp in possible_paths:
+            if os.path.exists(hhp):
+                self.pathfound = hhp
+                try:
+                    dirs = [d for d in os.listdir(self.pathfound) if os.path.isdir(os.path.join(self.pathfound, d))]
+                    if dirs:
+                        self.herofound = dirs[0]
+                        self.pathfound = os.path.join(self.pathfound, self.herofound)
+                    break
+                except Exception:
+                    pass
         return
         
     def detectPokerStars(self):

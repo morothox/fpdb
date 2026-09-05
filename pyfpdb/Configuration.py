@@ -92,7 +92,7 @@ if sysPlatform[0:5] == 'Linux':
 elif sysPlatform == 'Darwin':
     OS_FAMILY = 'Mac'
 elif sysPlatform == 'Windows':
-    if platform.release() <> 'XP':
+    if platform.release() != 'XP':
         OS_FAMILY = 'Win7' #Vista and win7
     else:
         OS_FAMILY = 'XP'

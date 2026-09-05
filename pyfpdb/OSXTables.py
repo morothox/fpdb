@@ -31,12 +31,38 @@ import os
 import gtk
 
 #    Other Library modules
-from Quartz.CoreGraphics import *
+QUARTZ_AVAILABLE = True
+try:
+    from Quartz.CoreGraphics import *
+except ImportError:
+    try:
+        from Quartz import *
+    except ImportError:
+        QUARTZ_AVAILABLE = False
 
 #    FPDB modules
 from TableWindow import Table_Window
 
 class Table(Table_Window):
+
+    def get_window_list(self):
+        """Retrieve the current Quartz CGWindowList description array."""
+        if not QUARTZ_AVAILABLE:
+            return []
+
+        try:
+            options = kCGWindowListOptionOnScreenOnly | kCGWindowListExcludeDesktopElements
+            win_list = CGWindowListCopyWindowInfo(options, kCGNullWindowID)
+            if win_list:
+                return win_list
+        except Exception:
+            pass
+
+        try:
+            win_list = CGWindowListCreate(0, 0)
+            return CGWindowListCreateDescriptionFromArray(win_list)
+        except Exception:
+            return []
 
     def find_table_parameters(self):
 
@@ -45,14 +71,16 @@ class Table(Table_Window):
 #    self.window, and self.parent (if required).
 
         self.number = None
-        WinList = CGWindowListCreate(0,0)
-        WinListDict = CGWindowListCreateDescriptionFromArray(WinList)
+        win_list_dict = self.get_window_list()
 
-        for d in WinListDict:
-            if re.search(self.search_string, d.get(kCGWindowName, ""), re.I):
-                title = d[kCGWindowName]
+        for d in win_list_dict:
+            window_name = d.get(kCGWindowName, "") or d.get("kCGWindowName", "")
+            if not window_name:
+                continue
+            if re.search(self.search_string, window_name, re.I):
+                title = window_name
                 if self.check_bad_words(title): continue
-                self.number = int(d[kCGWindowNumber])
+                self.number = int(d.get(kCGWindowNumber, d.get("kCGWindowNumber", 0)))
                 self.title = title
                 return self.title
         if self.number is None:
@@ -60,25 +88,26 @@ class Table(Table_Window):
   
     def get_geometry(self):
 
-        WinList = CGWindowListCreate(0,0)
-        WinListDict = CGWindowListCreateDescriptionFromArray(WinList)
+        win_list_dict = self.get_window_list()
 
-        for d in WinListDict:
-            if d[kCGWindowNumber] == self.number:
-                return {'x'      : int(d[kCGWindowBounds]['X']),
-                        'y'      : int(d[kCGWindowBounds]['Y']),
-                        'width'  : int(d[kCGWindowBounds]['Width']),
-                        'height' : int(d[kCGWindowBounds]['Height'])
+        for d in win_list_dict:
+            wnum = d.get(kCGWindowNumber, d.get("kCGWindowNumber", None))
+            if wnum == self.number:
+                bounds = d.get(kCGWindowBounds, d.get("kCGWindowBounds", {}))
+                return {'x'      : int(bounds.get('X', 0)),
+                        'y'      : int(bounds.get('Y', 0)),
+                        'width'  : int(bounds.get('Width', 0)),
+                        'height' : int(bounds.get('Height', 0))
                        }
         return None
 
     def get_window_title(self):
-        WinList = CGWindowListCreate(0,0)
-        WinListDict = CGWindowListCreateDescriptionFromArray(WinList)
+        win_list_dict = self.get_window_list()
 
-        for d in WinListDict:
-            if d[kCGWindowNumber] == self.number:
-                return d[kCGWindowName]
+        for d in win_list_dict:
+            wnum = d.get(kCGWindowNumber, d.get("kCGWindowNumber", None))
+            if wnum == self.number:
+                return d.get(kCGWindowName, d.get("kCGWindowName", None))
         return None
 
     def topify(self, window):

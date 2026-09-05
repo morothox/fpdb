@@ -104,6 +104,9 @@ def site_alias(alias):
                 "OnGame"         : "OnGame",
                 "PacificPoker"   : "PacificPoker",
                 "Pacific"        : "PacificPoker",
+                "888"            : "PacificPoker",
+                "888poker"       : "PacificPoker",
+                "888Poker"       : "PacificPoker",
                 "Party"          : "PartyPoker",
                 "PartyPoker"     : "PartyPoker",
                 "Pkr"            : "Pkr",
@@ -119,7 +122,7 @@ def site_alias(alias):
               }
     try:
         tmp = aliases[alias]
-    except KeyError, e:
+    except KeyError as e:
         tmp = False
         print (_("Alias '%s' unknown") % alias)
 
@@ -127,9 +130,9 @@ def site_alias(alias):
 
 if __name__== "__main__":
     (options, argv) = fpdb_options()
-    print "errorsToConsole =", options.errorsToConsole
-    print "database name   =", options.dbname
-    print "config file     =", options.config
+    print("errorsToConsole =", options.errorsToConsole)
+    print("database name   =", options.dbname)
+    print("config file     =", options.config)
 
-    print _("press enter to end")
+    print(_("press enter to end"))
     sys.stdin.readline()
